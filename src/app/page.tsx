@@ -1,5 +1,9 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
+import { SignInButton, UserButton } from "@clerk/nextjs";
 import { PaperPlaneIcon, GearIcon } from "@radix-ui/react-icons";
+import { Authenticated, Unauthenticated } from "convex/react";
 
 export default function HomePage() {
   return (
@@ -33,9 +37,17 @@ export default function HomePage() {
           </a>
         </nav>
 
-        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6">
+        {/* <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6">
           Sign in
-        </Button>
+        </Button> */}
+        <div>
+          <Authenticated>
+            <UserButton />
+          </Authenticated>
+          <Unauthenticated>
+            <SignInButton />
+          </Unauthenticated>
+        </div>
       </header>
 
       {/* Main Content */}

@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  PaperPlaneIcon,
-  ReaderIcon,
-  GearIcon,
-  LightningBoltIcon,
-} from "@radix-ui/react-icons";
+import { PaperPlaneIcon, GearIcon } from "@radix-ui/react-icons";
 
 export default function HomePage() {
   return (
@@ -20,10 +14,10 @@ export default function HomePage() {
 
         <nav className="hidden md:flex items-center gap-8">
           <a
-            href="#"
+            href="/tasks"
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
-            Link 1
+            Tasks
           </a>
           <a
             href="#"

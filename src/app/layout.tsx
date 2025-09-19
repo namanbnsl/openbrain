@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Lexend } from "next/font/google";
+import { Fredoka } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Lexend({
-  variable: "--font-geist-sans",
+const mainFont = Fredoka({
   subsets: ["latin"],
 });
 
@@ -19,11 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body className={`${mainFont.className} antialiased`}>{children}</body>
     </html>
   );
 }

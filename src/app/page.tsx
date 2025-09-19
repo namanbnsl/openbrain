@@ -1,6 +1,11 @@
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { PaperPlaneIcon, ReaderIcon, GearIcon, LightningBoltIcon } from "@radix-ui/react-icons"
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  PaperPlaneIcon,
+  ReaderIcon,
+  GearIcon,
+  LightningBoltIcon,
+} from "@radix-ui/react-icons";
 
 export default function HomePage() {
   return (
@@ -8,23 +13,35 @@ export default function HomePage() {
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-2">
-          
-          <span className="text-xl text-foreground font-semibold tracking-wide">{"openBrain"}</span>
+          <span className="text-xl text-foreground font-semibold tracking-wide">
+            openbrain
+          </span>
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
-          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-            Blog
+          <a
+            href="#"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Link 1
           </a>
-          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-            Pricing
+          <a
+            href="#"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Link 2
           </a>
-          <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-            Our Mission
+          <a
+            href="#"
+            className="text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Link 3
           </a>
         </nav>
 
-        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6">Sign in</Button>
+        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6">
+          Sign in
+        </Button>
       </header>
 
       {/* Main Content */}
@@ -39,23 +56,24 @@ export default function HomePage() {
           </div>
         </div>
         <div className="absolute bottom-40 left-20 opacity-60">
-          <div className="text-muted-foreground text-sm transform -rotate-12">E=mc²</div>
+          <div className="text-muted-foreground text-sm transform -rotate-12">
+            E=mc²
+          </div>
         </div>
         <div className="absolute bottom-32 right-12 opacity-60">
           <GearIcon className="w-6 h-6 text-muted-foreground" />
         </div>
-        <div className="absolute top-40 right-32 opacity-60">
-          
-        </div>
+        <div className="absolute top-40 right-32 opacity-60"></div>
 
         {/* Main Heading */}
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-6 leading-tight text-balance">
-          {"The Ultimate AI Tutor."}
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium text-foreground mb-6 leading-tight text-balance">
+          The Ultimate AI Tutor.
         </h1>
 
         {/* Subheading */}
         <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-2xl leading-relaxed text-pretty">
-          Make learning feel effortless with AI that works alongside you. No switching apps, no losing focus.
+          Make learning feel effortless with AI that works alongside you. No
+          switching apps, no losing focus.
         </p>
 
         {/* CTA Button */}
@@ -63,10 +81,9 @@ export default function HomePage() {
           size="lg"
           className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 text-lg rounded-lg shadow-lg hover:shadow-xl transition-all duration-200"
         >
-          
           Try for free
         </Button>
       </main>
     </div>
-  )
+  );
 }

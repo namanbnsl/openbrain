@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 
 export default function SignUpPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-[calc(100vh-5rem)] flex items-center justify-center">
       <div className="w-full max-w-md px-4">
         <div className="grid w-full grow items-center px-4 sm:justify-center">
           <SignUp.Root>

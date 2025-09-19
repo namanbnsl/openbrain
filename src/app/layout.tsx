@@ -25,7 +25,9 @@ export default function RootLayout({
         <ClerkProvider>
           <ConvexClientProvider>
             <Navbar />
-            {children}
+            <main className="pt-20">
+              {children}
+            </main>
           </ConvexClientProvider>
         </ClerkProvider>
       </body>

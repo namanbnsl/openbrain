@@ -1,5 +1,7 @@
 # Vapi Integration Setup Guide
 
+# ( This Has Been Set Up)
+
 This guide will help you set up Vapi voice agents in your Classroom page.
 
 ## Prerequisites

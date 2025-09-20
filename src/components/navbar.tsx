@@ -25,10 +25,10 @@ export const Navbar = () => {
             Tasks
           </Link>
           <Link
-            href="#"
+            href="/classroom"
             className="text-muted-foreground hover:text-foreground transition-colors"
           >
-            Link 2
+            Classroom
           </Link>
           <Link
             href="#"

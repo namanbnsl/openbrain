@@ -3,6 +3,7 @@ import { Fredoka } from "next/font/google";
 import "./globals.css";
 import ConvexClientProvider from "@/app/providers/ConvexProviderWithClerk";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Navbar } from "@/components/navbar";
 
 const mainFont = Fredoka({
   subsets: ["latin"],
@@ -23,7 +24,10 @@ export default function RootLayout({
       <body className={`${mainFont.className} antialiased`}>
         <ClerkProvider>
           <ConvexClientProvider>
-            {children}
+            <Navbar />
+            <main className="pt-20">
+              {children}
+            </main>
           </ConvexClientProvider>
         </ClerkProvider>
       </body>

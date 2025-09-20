@@ -1,55 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { SignInButton, UserButton } from "@clerk/nextjs";
 import { PaperPlaneIcon, GearIcon } from "@radix-ui/react-icons";
-import { Authenticated, Unauthenticated } from "convex/react";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background grid-pattern">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2">
-          <span className="text-xl text-foreground font-semibold tracking-wide">
-            openbrain
-          </span>
-        </div>
-
-        <nav className="hidden md:flex items-center gap-8">
-          <a
-            href="/tasks"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Tasks
-          </a>
-          <a
-            href="#"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Link 2
-          </a>
-          <a
-            href="#"
-            className="text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Link 3
-          </a>
-        </nav>
-
-        {/* <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6">
-          Sign in
-        </Button> */}
-        <div>
-          <Authenticated>
-            <UserButton />
-          </Authenticated>
-          <Unauthenticated>
-            <SignInButton />
-          </Unauthenticated>
-        </div>
-      </header>
-
       {/* Main Content */}
       <main className="flex-1 flex px-6 py-20 max-w-4xl mx-auto text-center relative items-center flex-col justify-center min-h-[calc(100vh-120px)]">
         {/* Decorative Elements */}

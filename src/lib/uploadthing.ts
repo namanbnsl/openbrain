@@ -4,6 +4,43 @@ import path from "path";
 
 const utapi = new UTApi();
 
+type UploadFilesResponse = Awaited<ReturnType<typeof utapi.uploadFiles>>;
+type UploadFileResult = UploadFilesResponse[number];
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function readStringProperty(data: unknown, key: string): string | undefined {
+  if (!isRecord(data)) {
+    return undefined;
+  }
+
+  const value = data[key];
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function extractUploadUrl(result: UploadFileResult): string {
+  if (!result) {
+    throw new Error("No response from UploadThing");
+  }
+
+  if (result.error) {
+    throw new Error(`Upload failed: ${result.error.message}`);
+  }
+
+  if ("data" in result && result.data) {
+    const data = result.data as unknown;
+    const uploadUrl = readStringProperty(data, "ufsUrl") ?? readStringProperty(data, "url");
+    if (uploadUrl) {
+      return uploadUrl;
+    }
+    throw new Error("Upload succeeded but no data returned");
+  }
+
+  throw new Error("Unexpected UploadThing response shape");
+}
+
 export interface UploadRequest {
   videoPath: string;
   userId: string;
@@ -32,23 +69,11 @@ export async function uploadVideo({
       // Upload to UploadThing directly without saving to temp file
       console.log("Starting upload to UploadThing...");
       const response = await utapi.uploadFiles([file]);
-
-      // Check if upload was successful
       if (!response || response.length === 0) {
         throw new Error("No response from UploadThing");
       }
 
-      const uploadResult = response[0];
-      if (uploadResult.error) {
-        throw new Error(`Upload failed: ${uploadResult.error.message}`);
-      }
-
-      if (!uploadResult.data) {
-        throw new Error("Upload succeeded but no data returned");
-      }
-
-      const data = uploadResult.data as any;
-      const uploadUrl: string = (data?.ufsUrl as string) ?? (data?.url as string);
+      const uploadUrl = extractUploadUrl(response[0]);
       console.log(`Video uploaded successfully: ${uploadUrl}`);
       return uploadUrl;
     }
@@ -76,23 +101,11 @@ export async function uploadVideo({
     // Upload to UploadThing
     console.log("Starting upload to UploadThing...");
     const response = await utapi.uploadFiles([file]);
-
-    // Check if upload was successful
     if (!response || response.length === 0) {
       throw new Error("No response from UploadThing");
     }
 
-    const uploadResult = response[0];
-    if (uploadResult.error) {
-      throw new Error(`Upload failed: ${uploadResult.error.message}`);
-    }
-
-    if (!uploadResult.data) {
-      throw new Error("Upload succeeded but no data returned");
-    }
-
-    const data = uploadResult.data as any;
-    const uploadUrl: string = (data?.ufsUrl as string) ?? (data?.url as string);
+    const uploadUrl = extractUploadUrl(response[0]);
     console.log(`Video uploaded successfully: ${uploadUrl}`);
 
     // Clean up the temporary file if we created it
@@ -106,7 +119,7 @@ export async function uploadVideo({
     }
 
     return uploadUrl;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Upload failed:", error);
 
     // Best-effort cleanup for temp files created by renderer
@@ -128,6 +141,12 @@ export async function uploadVideo({
       }
     }
 
-    throw new Error(`Video upload failed: ${(error as Error).message}`);
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === "string"
+          ? error
+          : "Unknown error";
+    throw new Error(`Video upload failed: ${message}`);
   }
 }

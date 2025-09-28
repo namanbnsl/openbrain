@@ -5,10 +5,7 @@ export interface RenderRequest {
   prompt: string;
 }
 
-export async function renderManimVideo({
-  script,
-  prompt: _prompt,
-}: RenderRequest): Promise<string> {
+export async function renderManimVideo({ script, prompt }: RenderRequest): Promise<string> {
   let sandbox: Sandbox | null = null;
 
   try {
@@ -16,6 +13,8 @@ export async function renderManimVideo({
       timeoutMs: 1200000,
     });
     console.log("E2B sandbox created successfully");
+    const promptPreview = prompt.length > 120 ? `${prompt.slice(0, 117)}...` : prompt;
+    console.log("Rendering Manim video for prompt:", promptPreview);
 
     const scriptPath = `/home/user/script.py`;
     const mediaDir = `/home/user/media`;
@@ -85,9 +84,15 @@ export async function renderManimVideo({
       `Prepared base64 data URL for upload (length: ${base64.length} chars)`
     );
     return dataUrl;
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("E2B render error:", err);
-    throw new Error(`Failed to render Manim video: ${err.message}`);
+    const message =
+      err instanceof Error
+        ? err.message
+        : typeof err === "string"
+          ? err
+          : "Unknown error";
+    throw new Error(`Failed to render Manim video: ${message}`);
   } finally {
     console.log("E2B sandbox will be closed by the framework");
   }

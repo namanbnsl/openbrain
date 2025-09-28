@@ -60,10 +60,16 @@ export const generateVideo = inngest.createFunction(
         generatedAt: new Date().toISOString(),
         scriptLength: script.length,
       };
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error in generateVideo function:", err);
       if (jobId) {
-        await jobStore.setError(jobId, err?.message ?? "Unknown error");
+        const message =
+          err instanceof Error
+            ? err.message
+            : typeof err === "string"
+              ? err
+              : "Unknown error";
+        await jobStore.setError(jobId, message);
       }
       throw err;
     }

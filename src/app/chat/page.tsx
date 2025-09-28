@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ComponentProps } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -22,8 +22,68 @@ import {
   ToolInput,
   ToolOutput,
 } from "@/components/tool";
-import type { ToolUIPart } from "ai";
+import type { ToolUIPart, UIMessage } from "ai";
 import { VideoPlayer } from "@/components/video-player";
+
+type MessagePart = UIMessage extends { parts?: (infer Part)[] } ? Part : never;
+type VideoPlayerProps = ComponentProps<typeof VideoPlayer>;
+type ToolGenerateVideoPart = {
+  type: "tool-generate_video";
+  state: "input-available" | "output-available" | "output-error";
+  output?: unknown;
+  errorText?: string;
+};
+
+function isVideoPlayerProps(output: unknown): output is VideoPlayerProps {
+  if (typeof output !== "object" || output === null) {
+    return false;
+  }
+
+  const record = output as Record<string, unknown>;
+  const { jobId, description, status, src } = record;
+
+  const isValidStatus =
+    status === undefined ||
+    status === "generating" ||
+    status === "ready" ||
+    status === "error";
+
+  return (
+    typeof jobId === "string" &&
+    jobId.length > 0 &&
+    typeof description === "string" &&
+    description.length > 0 &&
+    (src === undefined || typeof src === "string") &&
+    isValidStatus
+  );
+}
+
+function toToolGenerateVideoPart(part: MessagePart): ToolGenerateVideoPart | null {
+  if (typeof part !== "object" || part === null) {
+    return null;
+  }
+
+  const record = part as Record<string, unknown>;
+  if (record.type !== "tool-generate_video") {
+    return null;
+  }
+
+  const state = record.state;
+  if (state !== "input-available" && state !== "output-available" && state !== "output-error") {
+    return null;
+  }
+
+  const errorText = record.errorText;
+
+  const toolPart: ToolGenerateVideoPart = {
+    type: "tool-generate_video",
+    state,
+    output: record.output,
+    errorText: typeof errorText === "string" ? errorText : undefined,
+  };
+
+  return toolPart;
+}
 
 export default function ChatPage() {
   const [input, setInput] = useState("");
@@ -74,10 +134,10 @@ export default function ChatPage() {
       >
         <Conversation>
           <ConversationContent>
-            {messages.map((message: any) => (
+            {messages.map((message: UIMessage) => (
               <Message from={message.role} key={message.id}>
                 <MessageContent>
-                  {message.parts?.map((part: any, i: number) => {
+                  {message.parts?.map((part: MessagePart, i: number) => {
                     switch (part.type) {
                       case "text":
                         return (
@@ -146,14 +206,24 @@ export default function ChatPage() {
                         );
                       }
                       case "tool-generate_video": {
-                        const toolPart = part;
+                        const toolPart = toToolGenerateVideoPart(part);
+                        if (!toolPart) {
+                          return null;
+                        }
                         switch (toolPart.state) {
                           case "input-available":
                             return <div key={i}>Loading video...</div>;
                           case "output-available":
+                            if (isVideoPlayerProps(toolPart.output)) {
+                              return (
+                                <div key={i}>
+                                  <VideoPlayer {...toolPart.output} />
+                                </div>
+                              );
+                            }
                             return (
                               <div key={i}>
-                                <VideoPlayer {...toolPart.output} />
+                                Video ready, but data is missing.
                               </div>
                             );
                           case "output-error":

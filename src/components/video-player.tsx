@@ -24,7 +24,7 @@ export function VideoPlayer({ jobId, status, src }: VideoPlayerProps) {
     if (!jobId || jobStatus === "ready" || jobStatus === "error") return;
 
     let cancelled = false;
-    let interval: any;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
     const poll = async () => {
       try {
@@ -36,25 +36,37 @@ export function VideoPlayer({ jobId, status, src }: VideoPlayerProps) {
           }
           return;
         }
-        const data = (await res.json()) as {
+        const data: {
           status: JobStatus;
           videoUrl?: string;
           error?: string;
-        };
+        } = await res.json();
         if (cancelled) return;
 
         if (data.status === "ready" && data.videoUrl) {
           setVideoUrl(data.videoUrl);
           setJobStatus("ready");
-          clearInterval(interval);
+          if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+          }
         } else if (data.status === "error") {
           setJobStatus("error");
           setError(data.error ?? "Video generation failed");
-          clearInterval(interval);
+          if (intervalId) {
+            clearInterval(intervalId);
+            intervalId = null;
+          }
         }
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (!cancelled) {
-          setError(e?.message ?? "Failed to check job status");
+          const message =
+            e instanceof Error
+              ? e.message
+              : typeof e === "string"
+                ? e
+                : "Failed to check job status";
+          setError(message);
           setJobStatus("error");
         }
       }
@@ -62,11 +74,14 @@ export function VideoPlayer({ jobId, status, src }: VideoPlayerProps) {
 
     // Start polling
     poll();
-    interval = setInterval(poll, 3000);
+    intervalId = setInterval(poll, 3000);
 
     return () => {
       cancelled = true;
-      if (interval) clearInterval(interval);
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
     };
   }, [jobId, jobStatus]);
 

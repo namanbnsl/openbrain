@@ -14,7 +14,7 @@ export default function Home() {
           className="font-mono text-sm md:text-base text-zinc-500 hover:text-foreground transition-colors"
         >
           <span className="rounded-md border b\order-zinc-200/60 dark:border-zinc-800/60 px-2 py-1">
-            brain.open()
+            openbrain
           </span>
         </Link>
         <nav className="flex items-center gap-2">
@@ -32,7 +32,7 @@ export default function Home() {
           <h1 className="text-4xl md:text-6xl font-semibold leading-tight">
             Learn faster with
             <span className="ml-2 inline-block rounded-lg border border-zinc-200/60 px-3 py-1 font-mono text-3xl md:text-5xl align-middle dark:border-zinc-800/60">
-              brain.open()
+              openbrain
             </span>
           </h1>
           <p className="max-w-2xl text-zinc-600 dark:text-zinc-300">

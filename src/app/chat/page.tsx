@@ -54,7 +54,7 @@ export default function ChatPage() {
             href="/"
             className="font-mono text-xs text-zinc-500 hover:text-foreground transition-colors"
           >
-            brain.open()
+            openbrain
           </Link>
           <span className="hidden md:inline text-zinc-400">/</span>
           <span className="hidden md:inline text-xs text-zinc-500">Chat</span>
@@ -84,8 +84,9 @@ export default function ChatPage() {
                           <Response
                             key={`${message.id}-${i}`}
                             className={`
-        max-w-none text-base leading-relaxed break-words ${message.role == "assistant" ? "p-4" : ""
-                              } rounded-lg
+        max-w-none text-base leading-relaxed break-words ${
+          message.role == "assistant" ? "p-4" : ""
+        } rounded-lg
 
         /* Direct element styling */
         [&>h1]:mt-6 [&>h1]:mb-4 [&>h1]:font-bold [&>h1]:text-xl
@@ -145,18 +146,20 @@ export default function ChatPage() {
                         );
                       }
                       case "tool-generate_video": {
-                        const toolPart = part
+                        const toolPart = part;
                         switch (toolPart.state) {
-                          case 'input-available':
+                          case "input-available":
                             return <div key={i}>Loading video...</div>;
-                          case 'output-available':
+                          case "output-available":
                             return (
                               <div key={i}>
                                 <VideoPlayer {...toolPart.output} />
                               </div>
                             );
-                          case 'output-error':
-                            return <div key={i}>Error: {toolPart.errorText}</div>;
+                          case "output-error":
+                            return (
+                              <div key={i}>Error: {toolPart.errorText}</div>
+                            );
                           default:
                             return null;
                         }
@@ -270,8 +273,9 @@ function formatExecutePythonOutput(output: unknown): string {
   // Show error prominently if present
   if (error) {
     try {
-      return `Error:\n\n\`\`\`\n${typeof error === "string" ? error : JSON.stringify(error, null, 2)
-        }\n\`\`\``;
+      return `Error:\n\n\`\`\`\n${
+        typeof error === "string" ? error : JSON.stringify(error, null, 2)
+      }\n\`\`\``;
     } catch {
       return `Error: ${String(error)}`;
     }
@@ -298,9 +302,9 @@ function formatExecutePythonOutput(output: unknown): string {
     try {
       sections.push(
         "Results:\n\n" +
-        "```json\n" +
-        JSON.stringify(results, null, 2) +
-        "\n```"
+          "```json\n" +
+          JSON.stringify(results, null, 2) +
+          "\n```"
       );
     } catch {
       sections.push("Results:\n\n" + String(results));

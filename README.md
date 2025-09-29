@@ -21,3 +21,5 @@ pnpm run dev
 6. Open `http://localhost:8288` in your browser to view the Inngest UI.
 
 To setup Vercel KV, create an Upstash on Vercel Storage. 
+
+Please build the `manim-ffmpeg-latex-voiceover` sandbox via the E2B cli and then put in your `E2B_API_KEY`.

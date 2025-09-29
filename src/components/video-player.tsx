@@ -74,7 +74,7 @@ export function VideoPlayer({ jobId, status, src }: VideoPlayerProps) {
 
     // Start polling
     poll();
-    intervalId = setInterval(poll, 3000);
+    intervalId = setInterval(poll, 15000);
 
     return () => {
       cancelled = true;

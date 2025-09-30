@@ -15,14 +15,7 @@ import {
 import { useChat } from "@ai-sdk/react";
 import { Response } from "@/components/response";
 import { Conversation, ConversationContent } from "@/components/conversation";
-import {
-  Tool,
-  ToolContent,
-  ToolHeader,
-  ToolInput,
-  ToolOutput,
-} from "@/components/tool";
-import type { ToolUIPart, UIMessage } from "ai";
+import type { UIMessage } from "ai";
 import { VideoPlayer } from "@/components/video-player";
 
 type MessagePart = UIMessage extends { parts?: (infer Part)[] } ? Part : never;
@@ -58,7 +51,9 @@ function isVideoPlayerProps(output: unknown): output is VideoPlayerProps {
   );
 }
 
-function toToolGenerateVideoPart(part: MessagePart): ToolGenerateVideoPart | null {
+function toToolGenerateVideoPart(
+  part: MessagePart
+): ToolGenerateVideoPart | null {
   if (typeof part !== "object" || part === null) {
     return null;
   }
@@ -69,7 +64,11 @@ function toToolGenerateVideoPart(part: MessagePart): ToolGenerateVideoPart | nul
   }
 
   const state = record.state;
-  if (state !== "input-available" && state !== "output-available" && state !== "output-error") {
+  if (
+    state !== "input-available" &&
+    state !== "output-available" &&
+    state !== "output-error"
+  ) {
     return null;
   }
 
@@ -177,34 +176,34 @@ export default function ChatPage() {
                             {part.text}
                           </Response>
                         );
-                      case "tool-execute_python": {
-                        type ExecutePythonUIPart = ToolUIPart<{
-                          execute_python: {
-                            input: { code: string };
-                            output: unknown;
-                          };
-                        }>;
-                        const toolPart = part as unknown as ExecutePythonUIPart;
-                        return (
-                          <Tool key={`${message.id}-${i}`} defaultOpen={true}>
-                            <ToolHeader
-                              type={toolPart.type}
-                              state={toolPart.state}
-                            />
-                            <ToolContent>
-                              <ToolInput input={toolPart.input} />
-                              <ToolOutput
-                                output={
-                                  <Response>
-                                    {formatExecutePythonOutput(toolPart.output)}
-                                  </Response>
-                                }
-                                errorText={toolPart.errorText}
-                              />
-                            </ToolContent>
-                          </Tool>
-                        );
-                      }
+                      // case "tool-execute_python": {
+                      //   type ExecutePythonUIPart = ToolUIPart<{
+                      //     execute_python: {
+                      //       input: { code: string };
+                      //       output: unknown;
+                      //     };
+                      //   }>;
+                      //   const toolPart = part as unknown as ExecutePythonUIPart;
+                      //   return (
+                      //     <Tool key={`${message.id}-${i}`} defaultOpen={true}>
+                      //       <ToolHeader
+                      //         type={toolPart.type}
+                      //         state={toolPart.state}
+                      //       />
+                      //       <ToolContent>
+                      //         <ToolInput input={toolPart.input} />
+                      //         <ToolOutput
+                      //           output={
+                      //             <Response>
+                      //               {formatExecutePythonOutput(toolPart.output)}
+                      //             </Response>
+                      //           }
+                      //           errorText={toolPart.errorText}
+                      //         />
+                      //       </ToolContent>
+                      //     </Tool>
+                      //   );
+                      // }
                       case "tool-generate_video": {
                         const toolPart = toToolGenerateVideoPart(part);
                         if (!toolPart) {

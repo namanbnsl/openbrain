@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, type ComponentProps } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+ 
 import { Separator } from "@/components/ui/separator";
 import { Message, MessageAvatar, MessageContent } from "@/components/message";
 import {
@@ -17,11 +16,18 @@ import { Response } from "@/components/response";
 import { Conversation, ConversationContent } from "@/components/conversation";
 import type { UIMessage } from "ai";
 import { VideoPlayer } from "@/components/video-player";
+import { VoiceTeaching } from "@/components/voice-teaching";
 
 type MessagePart = UIMessage extends { parts?: (infer Part)[] } ? Part : never;
 type VideoPlayerProps = ComponentProps<typeof VideoPlayer>;
 type ToolGenerateVideoPart = {
   type: "tool-generate_video";
+  state: "input-available" | "output-available" | "output-error";
+  output?: unknown;
+  errorText?: string;
+};
+type ToolTeachLivePart = {
+  type: "tool-teach_live";
   state: "input-available" | "output-available" | "output-error";
   output?: unknown;
   errorText?: string;
@@ -84,53 +90,70 @@ function toToolGenerateVideoPart(
   return toolPart;
 }
 
+function toToolTeachLivePart(
+  part: MessagePart
+): ToolTeachLivePart | null {
+  if (typeof part !== "object" || part === null) {
+    return null;
+  }
+
+  const record = part as Record<string, unknown>;
+  if (record.type !== "tool-teach_live") {
+    return null;
+  }
+
+  const state = record.state;
+  if (
+    state !== "input-available" &&
+    state !== "output-available" &&
+    state !== "output-error"
+  ) {
+    return null;
+  }
+
+  const errorText = record.errorText;
+
+  const toolPart: ToolTeachLivePart = {
+    type: "tool-teach_live",
+    state,
+    output: record.output,
+    errorText: typeof errorText === "string" ? errorText : undefined,
+  };
+
+  return toolPart;
+}
+
 export default function ChatPage() {
   const [input, setInput] = useState("");
+  const [activeTeachingSession, setActiveTeachingSession] = useState<string | null>(null);
+  const [showVoiceWidget, setShowVoiceWidget] = useState<{ [key: string]: boolean }>({});
+  const [voiceSummaries, setVoiceSummaries] = useState<Array<{ id: string; summary: string }>>([]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    sendMessage(
-      { text: input },
-      {
-        body: {
-          model: "gemini-2.5-flash",
-        },
-      }
-    );
+    sendMessage({ text: input }, { body: { model: "gemini-2.5-flash" } });
     setInput("");
   };
 
   const { messages, status, sendMessage } = useChat();
 
+  const handleConversationEnd = (messageId: string, conversation: Array<{ role: string; content: string }>) => {
+    // Format conversation as a summary
+    const summary = conversation.map((msg, idx) => 
+      `**${msg.role === "user" ? "You" : "AI Tutor"}**: ${msg.content}`
+    ).join("\n\n");
+    
+    // Add to voice summaries state (will be displayed as system message)
+    setVoiceSummaries(prev => [...prev, { id: messageId, summary }]);
+    
+    // Hide the widget
+    setShowVoiceWidget(prev => ({ ...prev, [messageId]: false }));
+  };
+
   return (
-    <div className="relative flex flex-col h-svh">
-      {/* Background wash */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_left,rgba(120,120,255,0.05),transparent_50%)]" />
-      {/* Top bar */}
-      <header className="flex items-center justify-between gap-3 px-4 md:px-6 py-4 border-b border-zinc-200/70 dark:border-zinc-800/70">
-        <div className="flex items-center gap-2">
-          <Link
-            href="/"
-            className="font-mono text-xs text-zinc-500 hover:text-foreground transition-colors"
-          >
-            openbrain
-          </Link>
-          <span className="hidden md:inline text-zinc-400">/</span>
-          <span className="hidden md:inline text-xs text-zinc-500">Chat</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="hidden sm:inline-flex">
-            New chat
-          </Button>
-          <Button variant="ghost" size="sm" className="text-zinc-500">
-            Settings
-          </Button>
-        </div>
-      </header>
+    <div className="flex flex-col h-svh">
       {/* Chat area */}
-      <div
-        className={`mx-auto w-full max-w-7xl flex-1 px-4 md:px-6 flex flex-col`}
-      >
+      <div className={`mx-auto w-full max-w-3xl flex-1 p-4 flex flex-col`}>
         <Conversation>
           <ConversationContent>
             {messages.map((message: UIMessage) => (
@@ -269,6 +292,62 @@ export default function ChatPage() {
                       //   }
                       // return null;
                       // }
+                      case "tool-teach_live": {
+                        const toolPart = toToolTeachLivePart(part);
+                        if (!toolPart) {
+                          return null;
+                        }
+                        switch (toolPart.state) {
+                          case "input-available":
+                            return <div key={i}>Preparing live teaching session...</div>;
+                          case "output-available":
+                            const output = toolPart.output as Record<string, unknown>;
+                            const topic = typeof output?.topic === "string" ? output.topic : "General Learning";
+                            const widgetId = `${message.id}-${i}`;
+                            
+                            // Check if we have a summary for this widget
+                            const voiceSummary = voiceSummaries.find(s => s.id === widgetId);
+                            
+                            // Show widget only if not explicitly hidden
+                            if (showVoiceWidget[widgetId] === false) {
+                              // Show summary if available
+                              if (voiceSummary) {
+                                return (
+                                  <div key={i} className="my-4">
+                                    <div className="p-4 rounded-lg bg-muted border border-border">
+                                      <div className="text-xs font-semibold mb-2 text-muted-foreground">
+                                        Voice Teaching Session Summary
+                                      </div>
+                                      <Response className="text-sm">
+                                        {voiceSummary.summary}
+                                      </Response>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }
+                            
+                            return (
+                              <div key={i} className="my-4">
+                                <VoiceTeaching 
+                                  topic={topic}
+                                  onClose={() => {
+                                    setShowVoiceWidget(prev => ({ ...prev, [widgetId]: false }));
+                                    setActiveTeachingSession(null);
+                                  }}
+                                  onConversationEnd={(conversation) => handleConversationEnd(widgetId, conversation)}
+                                />
+                              </div>
+                            );
+                          case "output-error":
+                            return (
+                              <div key={i} className="text-destructive">Error: {toolPart.errorText}</div>
+                            );
+                          default:
+                            return null;
+                        }
+                      }
                       default:
                         return null;
                     }
@@ -293,7 +372,7 @@ export default function ChatPage() {
               value={input}
             />
             <PromptInputToolbar>
-              <PromptInputTools></PromptInputTools>
+              <PromptInputTools />
               <PromptInputSubmit disabled={!input} status={status} />
             </PromptInputToolbar>
           </PromptInput>

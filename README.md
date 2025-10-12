@@ -5,7 +5,7 @@ An intelligent teaching platform with video generation and live voice tutoring c
 ## Features
 
 - 🎥 **Manim Video Generation**: Create educational animations using AI
-- 🎙️ **Live Voice Teaching**: Real-time voice interaction with AI tutor powered by LiveKit and Google Gemini
+- 🎙️ **Live Voice Teaching**: Real-time voice interaction with AI tutor powered by Deepgram, ElevenLabs and Google Gemini
 - 💬 **Chat Interface**: Text-based AI assistance
 - 🧠 **Smart Tools**: Automatic tool selection based on user requests
 

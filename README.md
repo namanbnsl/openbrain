@@ -88,3 +88,7 @@ Just run `bun dev` and it works!
 - **Video**: Manim Community for animations
 - **Sandbox**: E2B for code execution
 - **Jobs**: Inngest for background processing
+
+To setup Vercel KV, create an Upstash on Vercel Storage. 
+
+Please build the `manim-ffmpeg-latex-voiceover` sandbox via the E2B cli and then put in your `E2B_API_KEY`.

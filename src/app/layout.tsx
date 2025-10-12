@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
+import { Lexend } from "next/font/google";
 import { ConvexClientProvider } from "@/components/providers/ConvexClientProvider";
 
 import "./globals.css";
 
-const geistMono = Geist_Mono({
+const mainFont = Lexend({
   subsets: ["latin"],
 });
 
@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <ConvexClientProvider>
         <body
-          className={`${geistMono.className} antialiased min-h-screen text-[var(--foreground)]`}
+          className={`${mainFont.className} antialiased min-h-screen text-[var(--foreground)]`}
         >
           {children}
         </body>

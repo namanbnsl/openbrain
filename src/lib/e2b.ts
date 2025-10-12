@@ -24,24 +24,10 @@ export async function renderManimVideo({ script, prompt }: RenderRequest): Promi
     await sandbox.files.write(scriptPath, script);
     console.log("Manim script written to sandbox");
 
-    const checkLatex = await sandbox.commands.run(`latex --version`, {
-      onStdout: (d) => console.log(d),
-      onStderr: (d) => console.error(d),
-    });
-
-    if (checkLatex.exitCode !== 0) {
-      throw new Error(
-        `Latex failed: ${checkLatex.exitCode}\n${checkLatex.stderr}`
-      );
-    }
 
     // Run manim
     const proc = await sandbox.commands.run(
       `manim ${scriptPath} MyScene --media_dir ${mediaDir} -ql --disable_caching --format=mp4`,
-      {
-        onStdout: (d) => console.log(d),
-        onStderr: (d) => console.error(d),
-      }
     );
 
     if (proc.exitCode !== 0) {

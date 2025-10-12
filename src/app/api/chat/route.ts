@@ -70,6 +70,26 @@ export async function POST(req: Request) {
           };
         },
       }),
+      teach_live: tool({
+        description:
+          "Start a live VOICE teaching session with an AI tutor. ONLY use this when the user EXPLICITLY asks for 'live' teaching, 'voice' teaching, or 'live session'. Examples: 'teach me live', 'explain this live', 'live tutoring'. DO NOT use for normal text-based teaching requests.",
+        inputSchema: z.object({
+          topic: z
+            .string()
+            .describe(
+              "The topic or subject the user wants to learn about in the live session"
+            ),
+        }),
+        execute: async ({ topic }) => {
+          console.log("Starting live teaching session for:", topic);
+
+          return {
+            status: "ready",
+            topic,
+            sessionType: "live-voice-teaching",
+          };
+        },
+      }),
     },
   });
 
